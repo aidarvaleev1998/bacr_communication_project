@@ -20,6 +20,7 @@
 #include "utilities.h"
 #include "robot-env.h"
 #include <algorithm>
+#include <stdexcept>
 
 // the current step
 int cstep;
@@ -227,61 +228,61 @@ double Problem::step()
     dist = sqrt( pow((rob->x - (rob+1)->x), 2) + pow((rob->y - (rob+1)->y), 2) );
     for (r=0, ro=rob; r < nrobots; r++, ro++)
     {
-	  if (updateRobot(ro, cacti) > 0)
-      {
-	  	 *cdone = 1;
-         struct robot *ro2 = (r==0) ? rob+1 : rob;
-         double anglVari = abs(ro->leftSpeed - ro->rightSpeed) / ro->axleLength;
-         double speed = std::min(ro->leftSpeed, ro->rightSpeed) / anglVari + (ro->axleLength/2.0);
 
-         // Each robot should have 3 sub goals. Reward is sum of sub goals.
-	  	 switch (ro->goal[0])
-         {
-           case 0:
-             // TODO: How to compute real speed
-             // GA1
-             reward += speed/(ro->maxSpeed);
-             break;
-           case 1:
-             // GA2
-             reward += 1.0 - speed/(ro->maxSpeed);
-             break;
-         }
-         switch (ro->goal[1])
-         {
-           case 0:
-             // GB1
-             reward += dist/maxdist;
-             break;
-           case 1:
-             // GB2
-             reward += 1.0 - dist/maxdist;
-             break;
-         }
-         switch (ro->goal[2])
-         {
-           case 0:
-             // GC1
-             reward += (ro->y < ro2->y) ? 1 : 0;
-             break;
-           case 1:
-             // GC2
-             reward += (ro->y > ro2->y) ? 1 : 0;
-             break;
-           case 2:
-             // GC3
-             reward += (ro->x < ro2->x) ? 1 : 0;
-             break;
-           case 3:
-             // GC3
-             reward += (ro->x > ro2->x) ? 1 : 0;
-             break;
-         }
+     updateRobot(ro, cacti);
+     struct robot *ro2 = (r==0) ? rob+1 : rob;
+     double anglVari = abs(ro->leftSpeed - ro->rightSpeed) / ro->axleLength;
+     double speed = std::min(ro->leftSpeed, ro->rightSpeed) / anglVari + (ro->axleLength/2.0);
+
+     // Each robot should have 3 sub goals. Reward is sum of sub goals.
+     switch (ro->goal[0])
+     {
+       case 0:
+         // TODO: How to compute real speed
+         // GA1
+         reward += speed/(ro->maxSpeed);
+         break;
+       case 1:
+         // GA2
+         reward += 1.0 - speed/(ro->maxSpeed);
+         break;
+     }
+     switch (ro->goal[1])
+     {
+       case 0:
+         // GB1
+         reward += dist/maxdist;
+         break;
+       case 1:
+         // GB2
+         reward += 1.0 - dist/maxdist;
+         break;
+     }
+     switch (ro->goal[2])
+     {
+       case 0:
+         // GC1
+         reward += (ro->y < ro2->y) ? 1 : 0;
+         break;
+       case 1:
+         // GC2
+         reward += (ro->y > ro2->y) ? 1 : 0;
+         break;
+       case 2:
+         // GC3
+         reward += (ro->x < ro2->x) ? 1 : 0;
+         break;
+       case 3:
+         // GC3
+         reward += (ro->x > ro2->x) ? 1 : 0;
+         break;
+
       }
-        
+
       if (r < (nrobots - 1))
          cacti = (cacti + noutputs);
     }
+
     
 	getObs();
     
@@ -347,6 +348,7 @@ Problem::initEnvironment()
     }
     
 }
+
 
 
 /*

@@ -1,8 +1,6 @@
-from typing import Optional, List, Union, Dict, Type, Any, Tuple
+from typing import Tuple
 
-import gym
 from gym.vector.utils import spaces
-from stable_baselines3.common.distributions import Distribution
 from stable_baselines3.common.policies import ActorCriticPolicy
 import torch as th
 from stable_baselines3.common.torch_layers import MlpExtractor
